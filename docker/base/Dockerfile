@@ -4,9 +4,9 @@ FROM eclipse-temurin:${java_image_tag}
 # -- Layer: Image Metadata
 
 ARG build_date
-ARG delta_spark_version
-ARG deltalake_version
-ARG pandas_version
+ARG delta_spark_version=2.4.0
+ARG deltalake_version=0.10.0
+ARG pandas_version=2.0.1
 
 LABEL org.label-schema.build-date=${build_date}
 LABEL org.label-schema.description="Data Engineering wih Apache Spark and Delta Lake Cookbook  - Cluster base image"
@@ -19,19 +19,18 @@ ARG shared_workspace=/opt/workspace
 RUN mkdir -p ${shared_workspace}/data && \
     mkdir -p /usr/share/man/man1  && \
     apt-get update -y && \
-    apt-get install -y --no-install-recommends curl python3 r-base netcat && \
+    apt-get install -y --no-install-recommends curl python3 r-base netcat-openbsd && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends build-essential manpages-dev python3-pip python3-dev && \
-    pip3 install  --no-cache-dir --upgrade pip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # We are explicitly pinning the versions of various libraries which this Docker image runs on.
-RUN pip3 install --quiet --no-cache-dir \
+RUN pip3 install --break-system-packages --quiet --no-cache-dir \
     delta-spark==${delta_spark_version} \
     deltalake==${deltalake_version} \
     pandas==${pandas_version}
